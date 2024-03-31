@@ -19,13 +19,18 @@
 // get refs to the input and output elements in the page
 const input = document.getElementById("target");
 const output = document.querySelector("output");
+const optionsList = document.getElementById("available-targets");
 
 // when the input has focus and enter is pressed, invoke the function named later
 input.addEventListener("keydown", (ev) => {
   console.debug("keydown", ev.key);
   if (ev.key === "Enter") {
     console.log("Enter detected. current value:", input.value);
-    // TODO use the provided later() function here
+    const inputValue = input.value.trim();
+    if (inputValue.length > 0) {
+      // If there is a query, get matching options
+      options((keys) => populateOptions(keys));
+    }
   }
 });
 
@@ -40,6 +45,7 @@ input.addEventListener("keydown", (ev) => {
 const setOutput = (target, valediction) => {
   console.log("setOutput", target, valediction);
   // TODO see comments just above 🙄
+  output.textContent = `${valediction}, ${target}`;
 };
 
 // for Part 2
@@ -48,3 +54,21 @@ const setOutput = (target, valediction) => {
 // (if the user hasn't entered anything, simply exclude the query argument in your invocation to options).
 // add each of the resulting target options as buttons in list items in the ul.
 // when any of these buttons are clicked, user the later() function to request the corresponding valediction and update the output element as in Part 1
+
+function populateOptions(keys) {
+  optionsList.innerHTML = ''; // Clear current options
+  keys.forEach((key) => {
+    const li = document.createElement("li");
+    const button = document.createElement("button");
+    button.textContent = key;
+    button.onclick = () => requestValediction(key); // Request valediction when button is clicked
+    li.appendChild(button);
+    optionsList.appendChild(li);
+  });
+}
+
+function requestValediction(target) {
+  later(target, (result) => {
+    setOutput(result.target, result.valediction);
+  });
+}
